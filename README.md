@@ -1,5 +1,5 @@
 # Variational Causal Networks
- Pytorch implementation of [Variational Causal Networks: Approximate Bayesian Inference over Causal Structures](https://arxiv.org/abs/2106.07635) (Annadani et al. 2021) in PyTorch.
+ Pytorch implementation of [Variational Causal Networks: Approximate Bayesian Inference over Causal Structures](https://arxiv.org/abs/2106.07635) (Annadani et al. 2021).
  
 [Yashas Annadani](https://yashasannadani.com), [Jonas Rothfuss](https://las.inf.ethz.ch/people/jonas-rothfuss), [Alexandre Lacoste](https://ca.linkedin.com/in/alexandre-lacoste-4032465), [Nino Scherrer](https://ch.linkedin.com/in/ninoscherrer), [Anirudh Goyal](https://anirudh9119.github.io/), [Yoshua Bengio](https://mila.quebec/en/yoshua-bengio/), [Stefan Bauer](https://www.is.mpg.de/~sbauer)
  
