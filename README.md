@@ -22,6 +22,8 @@ In the paper we run the model on 20 different data seeds to obtain confidence in
 If you have any questions, please address them to: Yashas Annadani `yashas.annadani@gmail.com`
 
 If you use this work, please cite:
+
+
 `
 		@article{annadani2021variational,
   		title={Variational Causal Networks: Approximate Bayesian Inference over Causal Structures},
