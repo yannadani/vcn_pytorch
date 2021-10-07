@@ -19,8 +19,9 @@ class Generator(torch.utils.data.Dataset):
 		self.sigma_prior = sigma_prior
 		if seed is not None:
 			self.reseed(seed)
-		self.sample_weights()
-		self.build_graph()
+		if not "self.weighted_adjacency_matrix" in locals():
+			self.sample_weights()
+			self.build_graph()
 	
 	def reseed(self, seed = None):
 		torch.manual_seed(seed)
@@ -125,5 +126,4 @@ class Generator(torch.utils.data.Dataset):
 	
 	def __len__(self):
 		return self.num_samples
-
 
