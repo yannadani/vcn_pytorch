@@ -146,7 +146,7 @@ def full_kl_and_hellinger(model, bge_train, g_dist, device):
     return torch.distributions.kl.kl_divergence(graph_q, graph_p).item(), hellinger.item()
 
 
-def train(model, bge_train, optimizer, baseline, batch_size, e, device):
+def train(model, bge_train, optimizer, baseline, batch_size, e, interv_targets, device):
     kl_graphs = 0.
     losses = 0.
     likelihoods = 0.
@@ -154,7 +154,7 @@ def train(model, bge_train, optimizer, baseline, batch_size, e, device):
     model.train()
    
     optimizer.zero_grad()
-    likelihood, kl_graph, log_probs = model(batch_size, bge_train, e)  #TODO: Check if additional entropy regularization is required
+    likelihood, kl_graph, log_probs = model(batch_size, bge_train, e, interv_targets)  #TODO: Check if additional entropy regularization is required
     score_val = ( - likelihood + kl_graph).detach()
     per_sample_elbo = log_probs*(score_val-baseline)
     baseline = 0.95 * baseline + 0.05 * score_val.mean() 
