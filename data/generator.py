@@ -9,7 +9,7 @@ class Generator(torch.utils.data.Dataset):
 
 	""" Base class for generating different graphs and performing ancestral sampling"""
 
-	def __init__(self, num_nodes, num_edges, noise_type, num_samples, mu_prior = None, sigma_prior = None, seed = None):
+	def __init__(self, num_nodes, num_edges, noise_type, num_samples, mu_prior = None, sigma_prior = None, seed = None, weighted_adjacency_matrix = None):
 		self.num_nodes = num_nodes
 		self.num_edges = num_edges
 		assert noise_type in NOISE_TYPES, 'Noise types must correspond to {} but got {}'.format(NOISE_TYPES, noise_type)
@@ -19,9 +19,12 @@ class Generator(torch.utils.data.Dataset):
 		self.sigma_prior = sigma_prior
 		if seed is not None:
 			self.reseed(seed)
-		if not "self.weighted_adjacency_matrix" in locals():
+		if weighted_adjacency_matrix is None:
 			self.sample_weights()
 			self.build_graph()
+		else:
+			self.weighted_adjacency_matrix = weighted_adjacency_matrix
+			self.adjacency_matrix = (weighted_adjacency_matrix > 0).astype(np.float32)
 	
 	def reseed(self, seed = None):
 		torch.manual_seed(seed)

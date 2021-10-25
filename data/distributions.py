@@ -6,7 +6,7 @@ from scipy.stats import multivariate_normal
 import itertools
 import networkx as nx
 
-from utils import expm_np, all_combinations
+from ..utils import expm_np, all_combinations
 import torch
 
 class GraphDistribution:

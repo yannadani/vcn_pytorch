@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import math
-import utils
+from  .. import utils
 
 class VCN(nn.Module):
 	def __init__(self, *, num_nodes, graph_dist, sparsity_factor = 0.0, gibbs_temp_init = 10., gibbs_update = None):
@@ -27,7 +27,7 @@ class VCN(nn.Module):
 
 	def sample(self, num_samples = 10000):
 		samples = self.graph_dist.sample([num_samples])
-		G = utils.vec_to_adj_mat(ret, self.num_nodes) 
+		G = utils.vec_to_adj_mat(samples, self.num_nodes) 
 		return G
 
 	def update_gibbs_temp(self, e):

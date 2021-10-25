@@ -9,12 +9,14 @@ import shutil
 import networkx as nx
 import time
 
-import utils
+from . import utils
 import matplotlib.pyplot as plt
-from models import vcn, autoreg_base, factorised_base, bge_model
-from data import erdos_renyi, distributions
+from .models import vcn, autoreg_base, factorised_base, bge_model
+from .data import erdos_renyi, distributions
 import graphical_models
 from sklearn import metrics
+
+data_map = {'er': erdos_renyi.ER}
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Variational Causal Networks')
@@ -213,15 +215,20 @@ def load_data(args):
     return bge_train, train_data
 
 def main(args):
+
+    if args.num_nodes <=4:
+        args.alpha_lambd = 10.
+        g_dist = distributions.GibbsDAGDistributionFull(args.num_nodes, args.gibbs_temp, args.sparsity_factor)
+    else:
+        args.alpha_lambd = 1000.
+        g_dist = distributions.GibbsUniformDAGDistribution(args.num_nodes, args.gibbs_temp, args.sparsity_factor)
+
     model = load_model(args)
 
     optimizer = torch.optim.Adam(model.parameters() , args.lr)
     
     bge_train, train_data = load_data(args)
-    if args.num_nodes <=4:
-        g_dist = distributions.GibbsDAGDistributionFull(args.num_nodes, args.gibbs_temp, args.sparsity_factor)
-    else:
-        g_dist = distributions.GibbsUniformDAGDistribution(args.num_nodes, args.gibbs_temp, args.sparsity_factor)
+
     
     best_elbo = 1e20
     likelihood = []
@@ -236,7 +243,7 @@ def main(args):
     if not args.eval_only:    
         for e in range(1, args.epochs + 1):
             temp_time = time.time()
-            el, li, kl_g, baseline = train(model, bge_train, optimizer, baseline, args.batch_size, e, args.device)
+            el, li, kl_g, baseline = train(model, bge_train, optimizer, baseline, args.batch_size, e, None, args.device)
             time_epoch.append(time.time()- temp_time)
             likelihood.append(li), kl_graph.append(kl_g), elbo_train.append(el)
             elbo_epoch, likelihood_epoch = evaluate(model, bge_train, args.batch_size, e, args.device)
@@ -247,8 +254,8 @@ def main(args):
                 if args.num_nodes<=4:
                     kl_full, hellinger_full = full_kl_and_hellinger(model, bge_train, g_dist, args.device)
 
-                print('Epoch {}:  TRAIN - ELBO: {:.5f} likelihood: {:.5f} kl graph: {:.5f} VAL-ELBO: {:.5f} Temp Target {:.4f} Time {:.2f}'.\
-                    format(e, el, li,kl_g, elbo_epoch, model.gibbs_temp, np.sum(time_epoch[e-100:e]), flush = True))
+                print('Epoch {}:  TRAIN - ELBO: {:.5f} likelihood: {:.5f} kl graph: {:.5f} VAL-ELBO: {:.5f} Temp Target {:.4f} KL Full {:.4f} Hellinger Full {:.4f} Time {:.2f}'.\
+                    format(e, el, li,kl_g, elbo_epoch, model.gibbs_temp, kl_full, hellinger_full, np.sum(time_epoch[e-100:e]), flush = True))
 
                 torch.save({'model':model.state_dict(), 'best_elbo':best_elbo, 'saved_epoch': e, 'time': time_epoch,\
                       'likelihood': likelihood, 'kl_graph': kl_graph, 'elbo_train': elbo_train, 'val_elbo': val_elbo, 'baseline': baseline}, osp.join(args.save_path, 'last_saved_model.pth'))
@@ -276,9 +283,4 @@ def main(args):
 
 if __name__ == '__main__':
     args = parse_args()
-    if args.num_nodes <=4:
-        args.alpha_lambd = 10.
-    else:
-        args.alpha_lambd = 1000.
-    data_map = {'er': erdos_renyi.ER}
     main(args)
