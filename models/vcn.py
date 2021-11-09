@@ -35,3 +35,10 @@ class VCN(nn.Module):
 			return 0
 		else:
 			self.gibbs_temp =  self.gibbs_update(self.gibbs_temp, e)
+
+	def mode(self, num_samples = 10000):
+		samples = self.graph_dist.sample([num_samples])
+		G = utils.vec_to_adj_mat(samples, self.num_nodes) 
+		log_prob = self.graph_dist.log_prob(samples)
+		index = torch.argmax(log_prob)
+		return G[index], log_prob[index].item()
