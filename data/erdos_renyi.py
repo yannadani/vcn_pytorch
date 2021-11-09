@@ -3,6 +3,7 @@ import torch
 from .generator import Generator
 import networkx as nx 
 import graphical_models
+from lift_dim import LiftDim
 
 class ER(Generator):
 	"""Generate erdos renyi random graphs using networkx's native random graph builder
@@ -35,6 +36,7 @@ class ER(Generator):
 		super().__init__(num_nodes, len(self.graph.edges), noise_type, num_samples, mu_prior = mu_prior , sigma_prior = sigma_prior, seed = seed)
 		self.init_sampler()
 		self.samples = self.sample(self.num_samples)
+		self.high_dim_samples = LiftDim(type = "linear")(self.samples)
 
 	def __getitem__(self, index):
 		return self.samples[index]
