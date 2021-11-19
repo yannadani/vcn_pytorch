@@ -17,7 +17,7 @@ class ER(Generator):
 		seed - random seed for data
 	"""
 	
-	def __init__(self, num_nodes, exp_edges = 1, noise_type='isotropic-gaussian', noise_sigma = 1.0, num_samples=1000, mu_prior = 2.0, sigma_prior = 1.0, seed = 10):
+	def __init__(self, num_nodes, exp_edges = 1, noise_type='isotropic-gaussian', noise_sigma = 1.0, num_samples=100, mu_prior = 2.0, sigma_prior = 1.0, seed = 10):
 		self.noise_sigma = noise_sigma
 		p = float(exp_edges)/ (num_nodes-1)
 		acyclic = 0

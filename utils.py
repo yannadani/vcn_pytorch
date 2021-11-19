@@ -11,6 +11,7 @@ from scipy.special import comb as scomb
 from scipy.spatial.distance import cdist
 from itertools import product
 import networkx as nx
+from scipy.special import logsumexp
 
 def simulate_gaussian_sem(graphs, w_logvar):
 	std = torch.exp(0.5*w_logvar)
@@ -67,9 +68,9 @@ def full_prior(num_nodes, num_classes=2, data_size = None, gibbs_temp = 10., spa
 		for j in range(num_nodes):
 			comb_full[i,j] = np.roll(temp_[j],j)
 		resid = expm_np(comb_full[i], num_nodes)
-		ref_config[i] = np.exp(-gibbs_temp*resid-sparsity_factor*np.sum(temp_))  
-	norm_factor = np.sum(ref_config)
-	ref_config = ref_config/norm_factor
+		ref_config[i] = -gibbs_temp*resid-sparsity_factor*np.sum(temp_)  
+	norm_factor = logsumexp(ref_config)
+	ref_config = ref_config - norm_factor
 	return ref_config, comb, norm_factor, comb_full
 
 def vec_to_adj_mat(matrix, num_nodes):
